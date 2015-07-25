@@ -24,7 +24,7 @@ func (e Error) Bind(fn failableFunc) Error {
 	if e.err != nil {
 		return e
 	}
-	return Return(fn())
+	return e.modify(fn())
 }
 
 func (e Error) Defer(fn deferrableFunc) Error {
@@ -41,13 +41,17 @@ func (e Error) Err() error {
 
 func (e Error) OnError() Error {
 	if e.err == nil {
-		return Return(ErrorWasExpected)
+		return e.modify(ErrorWasExpected)
 	}
-	return Return(nil)
+	return e.modify(nil)
 }
 
 func (e Error) resolveDeferred() {
 	for _, fn := range e.deferred {
 		fn()
 	}
+}
+
+func (e Error) modify(err error) Error {
+	return Error{err, e.deferred}
 }

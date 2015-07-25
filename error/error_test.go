@@ -116,6 +116,53 @@ func TestDeferOnErrorAfterErrDoesNotExecuteProvidedBlock(t *testing.T) {
 	assert.Equal(t, false, executed)
 }
 
+func TestDeferOnNoErrorIsPreservedAfterBind(t *testing.T) {
+	executed := false
+	Return(nil).Defer(
+		func() { executed = true },
+	).Bind(
+		func() error { return nil },
+	).Err()
+
+	assert.Equal(t, true, executed)
+}
+
+func TestDeferMultiple(t *testing.T) {
+	executed := false
+	executed2 := false
+	Return(nil).Defer(
+		func() { executed = true },
+	).Defer(
+		func() { executed2 = true },
+	).Err()
+
+	assert.Equal(t, true, executed)
+	assert.Equal(t, true, executed2)
+}
+
+func TestDeferIsPreservedAfterOnErrorOnNoError(t *testing.T) {
+	executed := false
+	Return(nil).Defer(
+		func() { executed = true },
+	).Bind(
+		func() error { return nil },
+	).OnError().Err()
+
+	assert.Equal(t, true, executed)
+}
+
+func TestDeferIsPreservedAfterOnErrorOnError(t *testing.T) {
+	err := errors.New("Boring error message")
+	executed := false
+	Return(nil).Defer(
+		func() { executed = true },
+	).Bind(
+		func() error { return err },
+	).OnError().Err()
+
+	assert.Equal(t, true, executed)
+}
+
 func TestErrOnNoErrorReturnsNil(t *testing.T) {
 	assert.Equal(t, nil, Return(nil).Err())
 }
