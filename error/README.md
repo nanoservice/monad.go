@@ -106,3 +106,7 @@ Use `(errorMonad.Error) Err` function to fetch the error, that failed the
 chain. `Err` returns `nil` if chain was successful.
 
 When `Err` is called, all deferred chain items get executed.
+
+---
+
+[List of Monads](/)
