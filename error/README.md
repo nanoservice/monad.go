@@ -100,6 +100,12 @@ acquiring them.
 
 Deferred chain items gets executed on call to `(errorMonad.Err) Err()`.
 
+```go
+e.Defer(func() {
+  resource.Close()
+})
+```
+
 ### `(errorMonad.Error) Err() error`
 
 Use `(errorMonad.Error) Err` function to fetch the error, that failed the
@@ -107,6 +113,10 @@ chain. `Err` returns `nil` if chain was successful.
 
 When `Err` is called, all deferred chain items get executed.
 
+```go
+e.Err()
+```
+
 ---
 
-[List of Monads](/)
+[List of Monads](https://github.com/nanoservice/monad.go)
