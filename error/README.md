@@ -51,7 +51,7 @@ func doStuff() error {
   }).Bind(func() error {
     return codeUsing(resource, status)
 
-  }).Err
+  }).Err()
 }
 ```
 
@@ -90,3 +90,19 @@ e.Bind(func() error {
   return doSomethingCausingError()
 })
 ```
+
+### `(errorMonad.Error) Defer(fn func()) errorMonad.Error`
+
+Use `(errorMonad.Error) Defer` function to attach deferred item to a chain.
+This item will be enqued for execution if and only if previous chain item
+haven't returned error. This is useful for freeing resources after successfully
+acquiring them.
+
+Deferred chain items gets executed on call to `(errorMonad.Err) Err()`.
+
+### `(errorMonad.Error) Err() error`
+
+Use `(errorMonad.Error) Err` function to fetch the error, that failed the
+chain. `Err` returns `nil` if chain was successful.
+
+When `Err` is called, all deferred chain items get executed.
