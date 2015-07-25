@@ -28,6 +28,8 @@ func doStuff() error {
 }
 ```
 
+Can be rewritten as:
+
 ```go
 func doStuff() error {
   var (
