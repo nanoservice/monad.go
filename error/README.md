@@ -119,4 +119,4 @@ e.Err()
 
 ---
 
-[List of Monads](https://github.com/nanoservice/monad.go)
+[List of Monads](https://github.com/nanoservice/monad.go#monads)
