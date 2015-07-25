@@ -1,5 +1,7 @@
 package error
 
+import "errors"
+
 type failableFunc func() error
 type deferrableFunc func()
 
@@ -7,6 +9,8 @@ type Error struct {
 	err      error
 	deferred []deferrableFunc
 }
+
+var ErrorWasExpected = errors.New("Error was expected")
 
 func Return(value error) Error {
 	return Error{value, make([]deferrableFunc, 0)}
@@ -33,6 +37,13 @@ func (e Error) Defer(fn deferrableFunc) Error {
 func (e Error) Err() error {
 	e.resolveDeferred()
 	return e.err
+}
+
+func (e Error) OnError() Error {
+	if e.err == nil {
+		return Return(ErrorWasExpected)
+	}
+	return Return(nil)
 }
 
 func (e Error) resolveDeferred() {

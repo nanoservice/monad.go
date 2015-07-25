@@ -117,6 +117,19 @@ When `Err` is called, all deferred chain items get executed.
 e.Err()
 ```
 
+### `(errorMonad.Error) OnError() errorMonad.Error`
+
+Use `(errorMonad.Error) OnError` to continue chain if and only if there was an
+error.
+
+```go
+Bind(func() error {
+  return ICanFail()
+}).OnError().Bind(func() error {
+  return ScheduleRetry()
+})
+```
+
 ---
 
 [List of Monads](https://github.com/nanoservice/monad.go#monads)

@@ -124,3 +124,14 @@ func TestErrOnErrorReturnsInnerValue(t *testing.T) {
 	err := errors.New("Unable to connect to server")
 	assert.Equal(t, err, Return(err).Err())
 }
+
+func TestOnErrorOnNoErrorReturnsSpecialError(t *testing.T) {
+	e := Return(nil).OnError()
+	assert.Equal(t, Return(ErrorWasExpected), e)
+}
+
+func TestOnErrorOnErrorReturnsNoError(t *testing.T) {
+	err := errors.New("Some Error")
+	e := Return(err).OnError()
+	assert.Equal(t, Return(nil), e)
+}
