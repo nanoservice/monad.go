@@ -20,11 +20,23 @@ func Bind(fn failableFunc) Error {
 	return Return(fn())
 }
 
+func Chain(fns ...failableFunc) Error {
+	return Return(nil).Chain(fns...)
+}
+
 func (e Error) Bind(fn failableFunc) Error {
 	if e.err != nil {
 		return e
 	}
 	return e.modify(fn())
+}
+
+func (e Error) Chain(fns ...failableFunc) (result Error) {
+	result = e
+	for _, fn := range fns {
+		result = result.Bind(fn)
+	}
+	return
 }
 
 func (e Error) Defer(fn deferrableFunc) Error {

@@ -91,6 +91,39 @@ e.Bind(func() error {
 })
 ```
 
+### `(errorMonad.Error) Chain(fn (func() error)...) errorMonad.Error`
+
+Use `(errorMonad.Error) Chain` function if you find yourself chaining too much
+`.Bind(fn)` calls in a row. It has analogous helper function `errorMonad.Chain(fn)`
+
+Given this code:
+
+```go
+e.Bind(func() error {
+  return doSomething(withThis)
+
+}).Bind(func() error {
+  return doSomething(withThat)
+
+}).Bind(func() (err error) {
+  result, err = andCalculateTheResult()
+  return
+})
+```
+
+Can be rewritten as:
+
+```go
+e.Chain(
+  func() error { return doSomething(withThis) },
+  func() error { return doSomething(withThat) },
+  func() (err error) {
+    result, err = andCalculateTheResult()
+    return
+  },
+)
+```
+
 ### `(errorMonad.Error) Defer(fn func()) errorMonad.Error`
 
 Use `(errorMonad.Error) Defer` function to attach deferred item to a chain.
