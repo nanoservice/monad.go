@@ -4,6 +4,7 @@ import "errors"
 
 type failableFunc func() error
 type deferrableFunc func()
+type handlerFunc func(error)
 
 type Error struct {
 	err      error
@@ -56,6 +57,13 @@ func (e Error) OnError() Error {
 		return e.modify(ErrorWasExpected)
 	}
 	return e.modify(nil)
+}
+
+func (e Error) OnErrorFn(fn handlerFunc) Error {
+	return e.OnError().Bind(func() error {
+		fn(e.err)
+		return nil
+	})
 }
 
 func (e Error) resolveDeferred() {

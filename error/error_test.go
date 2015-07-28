@@ -183,6 +183,23 @@ func TestOnErrorOnErrorReturnsNoError(t *testing.T) {
 	assert.Equal(t, Return(nil), e)
 }
 
+func TestOnErrorFnOnNoErrorDoesNotExecuteProvidedBlock(t *testing.T) {
+	var got error = nil
+	executed := false
+	Return(nil).OnErrorFn(func(err error) { executed = true; got = err })
+	assert.Equal(t, false, executed)
+	assert.Equal(t, nil, got)
+}
+
+func TestOnErrorFnOnErrorDoesExecuteProvidedBlock(t *testing.T) {
+	var got error = nil
+	executed := false
+	err := errors.New("Error")
+	Return(err).OnErrorFn(func(err error) { executed = true; got = err })
+	assert.Equal(t, true, executed)
+	assert.Equal(t, err, got)
+}
+
 func TestChainHelperCallsAllFunctionsWhenNoError(t *testing.T) {
 	i := 0
 	executed_1 := -1

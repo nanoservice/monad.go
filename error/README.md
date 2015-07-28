@@ -163,6 +163,14 @@ Bind(func() error {
 })
 ```
 
+This function has callback variant `(errorMonad.Error) OnErrorFn(fn func(err error)) errorMonad.Error`:
+
+```go
+e.OnErrorFn(func(err error) {
+  log.Printf("Some strange error occurred: %v\n", err)
+})
+```
+
 ---
 
 [List of Monads](https://github.com/nanoservice/monad.go#monads)
