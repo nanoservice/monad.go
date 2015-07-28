@@ -182,3 +182,77 @@ func TestOnErrorOnErrorReturnsNoError(t *testing.T) {
 	e := Return(err).OnError()
 	assert.Equal(t, Return(nil), e)
 }
+
+func TestChainHelperCallsAllFunctionsWhenNoError(t *testing.T) {
+	i := 0
+	executed_1 := -1
+	executed_2 := -1
+	executed_3 := -1
+
+	Chain(
+		func() error { executed_1 = i; i++; return nil },
+		func() error { executed_2 = i; i++; return nil },
+		func() error { executed_3 = i; i++; return nil },
+	)
+
+	assert.Equal(t, 0, executed_1)
+	assert.Equal(t, 1, executed_2)
+	assert.Equal(t, 2, executed_3)
+}
+
+func TestChainHelperCallsFunctionsUntilErrorOccurs(t *testing.T) {
+	i := 0
+	executed_1 := -1
+	executed_2 := -1
+	executed_3 := -1
+	err := errors.New("Very peculiar error")
+
+	Chain(
+		func() error { executed_1 = i; i++; return err },
+		func() error { executed_2 = i; i++; return nil },
+		func() error { executed_3 = i; i++; return nil },
+	)
+
+	assert.Equal(t, 0, executed_1)
+	assert.Equal(t, -1, executed_2)
+	assert.Equal(t, -1, executed_3)
+}
+
+func TestChainCallsAllFunctionsWhenNoError(t *testing.T) {
+	e := Return(nil)
+
+	i := 0
+	executed_1 := -1
+	executed_2 := -1
+	executed_3 := -1
+
+	e.Chain(
+		func() error { executed_1 = i; i++; return nil },
+		func() error { executed_2 = i; i++; return nil },
+		func() error { executed_3 = i; i++; return nil },
+	)
+
+	assert.Equal(t, 0, executed_1)
+	assert.Equal(t, 1, executed_2)
+	assert.Equal(t, 2, executed_3)
+}
+
+func TestChainCallsFunctionsUntilErrorOccurs(t *testing.T) {
+	e := Return(nil)
+
+	i := 0
+	executed_1 := -1
+	executed_2 := -1
+	executed_3 := -1
+	err := errors.New("Very peculiar error")
+
+	e.Chain(
+		func() error { executed_1 = i; i++; return err },
+		func() error { executed_2 = i; i++; return nil },
+		func() error { executed_3 = i; i++; return nil },
+	)
+
+	assert.Equal(t, 0, executed_1)
+	assert.Equal(t, -1, executed_2)
+	assert.Equal(t, -1, executed_3)
+}
