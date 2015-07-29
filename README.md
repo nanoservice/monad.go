@@ -5,6 +5,7 @@ Simple implementation of different monads in Golang.
 ## Monads
 
  * [`Error`](/error)
+ * [`Result`](/result)
 
 ## Contributing
 
