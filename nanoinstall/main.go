@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -27,7 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	url := rootUrl + version + "/" + *monad + "/" + *monad + ext
+	url := rootUrl + *version + "/" + *monad + "/" + *monad + ext
 
 	out, err := os.Create(*monad + ext)
 	if err != nil {
@@ -39,9 +40,14 @@ func main() {
 	if err != nil {
 		reportError(err)
 	}
-	defer resp.Close()
+	if resp.StatusCode != 200 {
+		reportError(
+			errors.New("Expected status code to be 200, but got: " + resp.Status),
+		)
+	}
+	defer resp.Body.Close()
 
-	n, err := io.Copy(out, resp.Body)
+	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		reportError(err)
 	}
