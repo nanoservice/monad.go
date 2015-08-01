@@ -55,3 +55,41 @@ func TestOnErrorFn(t *testing.T) {
 	assert.Equal(t, err, got)
 	assert.Equal(t, result_string.Failure(err), r)
 }
+
+func TestSuccessChain(t *testing.T) {
+	r := result_int.Success(15).Chain(
+		func(x int) result_int.Result {
+			return result_int.Success(x + 2)
+		},
+
+		func(x int) result_int.Result {
+			return result_int.Success(x * 2)
+		},
+
+		func(x int) result_int.Result {
+			return result_int.Success(x / 3)
+		},
+	)
+
+	assert.Equal(t, result_int.Success(11), r)
+}
+
+func TestFailedChain(t *testing.T) {
+	err := errors.New("The error")
+
+	r := result_string.Success("world").Chain(
+		func(name string) result_string.Result {
+			return result_string.Success("hello, " + name)
+		},
+
+		func(greeting string) result_string.Result {
+			return result_string.Failure(err)
+		},
+
+		func(_ string) result_string.Result {
+			return result_string.Success("bye")
+		},
+	)
+
+	assert.Equal(t, result_string.Failure(err), r)
+}
