@@ -1,4 +1,4 @@
-//go:generate nanoinstall -M result
+//go:generate nanoinstall -M result -v v1.0.1
 //go:generate nanotemplate -T string --input=result.go.t
 package main
 
@@ -72,7 +72,7 @@ func _readTemplate(_ string) result_string.Result {
 }
 
 func replace(target, value string) func(string) result_string.Result {
-	return func(string body) result_string.Result {
+	return func(body string) result_string.Result {
 		return result_string.Success(
 			strings.Replace(body, target, value, -1),
 		)
@@ -80,8 +80,8 @@ func replace(target, value string) func(string) result_string.Result {
 }
 
 func saveTo(outputFile string) func(string) result_string.Result {
-	return func(string body) result_string.Result {
-		err = ioutil.WriteFile(outputFile, []byte(result), filePermission)
+	return func(content string) result_string.Result {
+		err := ioutil.WriteFile(outputFile, []byte(content), filePermission)
 		return result_string.NewResult("", err)
 	}
 }
