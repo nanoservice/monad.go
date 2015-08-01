@@ -27,15 +27,11 @@ func main() {
 	flag.Parse()
 
 	if *typeName == "" {
-		fmt.Println("TYPE is not provided")
-		flag.Usage()
-		os.Exit(1)
+		reportIsNotProvided("TYPE")
 	}
 
 	if *inputFilename == "" {
-		fmt.Println("INPUT template filename is not provided")
-		flag.Usage()
-		os.Exit(1)
+		reportIsNotProvided("INPUT")
 	}
 
 	if *importName != "" {
@@ -55,6 +51,12 @@ func main() {
 		Bind(replace("{{t}}", lowercaseTypeName)).
 		Bind(saveTo(outputFile)).
 		OnErrorFn(reportGenerationError)
+}
+
+func reportIsNotProvided(what string) {
+	fmt.Printf("%s is not provided\n", what)
+	flag.Usage()
+	os.Exit(1)
 }
 
 func reportGenerationError(err error) {
