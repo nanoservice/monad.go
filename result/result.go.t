@@ -11,7 +11,7 @@ type Result struct {
 }
 
 func NewResult(value {{T}}, err error) Result {
-  return Result{value, err}
+  return Result{value: &value, err: err}
 }
 
 func Success(value {{T}}) Result {
