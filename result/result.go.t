@@ -24,3 +24,10 @@ func (r Result) Bind(fn func({{T}}) Result) Result {
 	}
 	return fn(*r.value)
 }
+
+func (r Result) OnErrorFn(fn func(error)) Result {
+  if r.err != nil {
+    fn(r.err)
+  }
+  return r
+}

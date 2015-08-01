@@ -35,3 +35,23 @@ func TestIntExample(t *testing.T) {
 	failure := result_int.Failure(err).Bind(addTwo)
 	assert.Equal(t, result_int.Failure(err), failure)
 }
+
+func TestOnErrorFn(t *testing.T) {
+	var called bool
+	var got error
+	var r result_string.Result
+
+	called = false
+	r = result_string.Success("yep!").
+		OnErrorFn(func(e error) { called = true })
+	assert.Equal(t, false, called)
+	assert.Equal(t, result_string.Success("yep!"), r)
+
+	called = false
+	err := errors.New("The error")
+	r = result_string.Failure(err).
+		OnErrorFn(func(e error) { called = true; got = e })
+	assert.Equal(t, true, called)
+	assert.Equal(t, err, got)
+	assert.Equal(t, result_string.Failure(err), r)
+}
