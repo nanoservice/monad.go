@@ -1,4 +1,4 @@
-//go:generate nanoinstall -M result -v v1.0.1
+//go:generate nanoinstall -M result -v v1.1.0
 //go:generate nanotemplate -T string --input=result.go.t
 package main
 
@@ -45,12 +45,12 @@ func main() {
 
 	os.Mkdir(packageName, dirPermission)
 
-	readTemplate().
-		Bind(replace("{{I}}", *importName)).
-		Bind(replace("{{T}}", *typeName)).
-		Bind(replace("{{t}}", lowercaseTypeName)).
-		Bind(saveTo(outputFile)).
-		OnErrorFn(reportGenerationError)
+	readTemplate().Chain(
+		replace("{{I}}", *importName),
+		replace("{{T}}", *typeName),
+		replace("{{t}}", lowercaseTypeName),
+		saveTo(outputFile),
+	).OnErrorFn(reportGenerationError)
 }
 
 func reportIsNotProvided(what string) {

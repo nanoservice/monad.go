@@ -10,6 +10,9 @@ type Result struct {
 	err   error
 }
 
+type handler func(string) Result
+type errorHandler func(error)
+
 func NewResult(value string, err error) Result {
   return Result{value: &value, err: err}
 }
@@ -22,14 +25,21 @@ func Failure(err error) Result {
 	return Result{value: nil, err: err}
 }
 
-func (r Result) Bind(fn func(string) Result) Result {
+func (r Result) Bind(fn handler) Result {
 	if r.err != nil {
 		return r
 	}
 	return fn(*r.value)
 }
 
-func (r Result) OnErrorFn(fn func(error)) Result {
+func (r Result) Chain(fns... handler) Result {
+  for _, fn := range fns {
+    r = r.Bind(fn)
+  }
+  return r
+}
+
+func (r Result) OnErrorFn(fn errorHandler) Result {
   if r.err != nil {
     fn(r.err)
   }
