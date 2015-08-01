@@ -10,6 +10,10 @@ type Result struct {
 	err   error
 }
 
+func NewResult(value {{T}}, err error) Result {
+  return Result{value, err}
+}
+
 func Success(value {{T}}) Result {
 	return Result{value: &value, err: nil}
 }
