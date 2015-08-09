@@ -93,3 +93,51 @@ func TestFailedChain(t *testing.T) {
 
 	assert.Equal(t, result_string.Failure(err), r)
 }
+
+func TestDeferOnSuccess(t *testing.T) {
+	executed := false
+
+	result_int.
+		Success(35).
+		Defer(func() { executed = true }).
+		Err()
+
+	assert.Equal(t, true, executed)
+}
+
+func TestDeferOnFailure(t *testing.T) {
+	executed := false
+	err := errors.New("The error")
+
+	result_int.
+		Failure(err).
+		Defer(func() { executed = true }).
+		Err()
+
+	assert.Equal(t, true, executed)
+}
+
+func TestDeferIsPreserved(t *testing.T) {
+	executed := false
+	err := errors.New("The error")
+
+	result_int.
+		Success(24).
+		Defer(func() { executed = true }).Bind(
+		func(x int) result_int.Result {
+			return result_int.Failure(err)
+		}).
+		Err()
+
+	assert.Equal(t, true, executed)
+}
+
+func TestDeferCallToErrIsRequired(t *testing.T) {
+	executed := false
+
+	result_int.
+		Success(25).
+		Defer(func() { executed = true })
+
+	assert.Equal(t, false, executed)
+}
