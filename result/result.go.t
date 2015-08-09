@@ -5,9 +5,10 @@ package result_{{t}}
 
 import ({{I}})
 
-type handler      func({{T}}) Result
-type errorHandler func(error)
-type deferHandler func()
+type handler           func({{T}}) Result
+type errorHandler      func(error)
+type deferHandler      func()
+type boundDeferHandler func({{T}})
 
 type Result struct {
         value         *{{T}}
@@ -36,11 +37,18 @@ func (r Result) Bind(fn handler) Result {
         return r.augment(result.value, result.err)
 }
 
-func (r Result) Defer(fn deferHandler) Result {
+func (r Result) Defer(fn boundDeferHandler) Result {
+        if r.err != nil {
+                return r
+        }
+
         return Result{
                 value:         r.value,
                 err:           r.err,
-                deferHandlers: append(r.deferHandlers, fn),
+                deferHandlers: append(
+                        r.deferHandlers,
+                        func() { fn(*r.value) },
+                ),
         }
 }
 

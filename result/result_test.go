@@ -96,13 +96,15 @@ func TestFailedChain(t *testing.T) {
 
 func TestDeferOnSuccess(t *testing.T) {
 	executed := false
+	var got int
 
 	result_int.
 		Success(35).
-		Defer(func() { executed = true }).
+		Defer(func(x int) { executed = true; got = x }).
 		Err()
 
 	assert.Equal(t, true, executed)
+	assert.Equal(t, 35, got)
 }
 
 func TestDeferOnFailure(t *testing.T) {
@@ -111,25 +113,27 @@ func TestDeferOnFailure(t *testing.T) {
 
 	result_int.
 		Failure(err).
-		Defer(func() { executed = true }).
+		Defer(func(_ int) { executed = true }).
 		Err()
 
-	assert.Equal(t, true, executed)
+	assert.Equal(t, false, executed)
 }
 
 func TestDeferIsPreserved(t *testing.T) {
 	executed := false
+	var got int
 	err := errors.New("The error")
 
 	result_int.
 		Success(24).
-		Defer(func() { executed = true }).Bind(
+		Defer(func(x int) { executed = true; got = x }).Bind(
 		func(x int) result_int.Result {
 			return result_int.Failure(err)
 		}).
 		Err()
 
 	assert.Equal(t, true, executed)
+	assert.Equal(t, 24, got)
 }
 
 func TestDeferCallToErrIsRequired(t *testing.T) {
@@ -137,7 +141,7 @@ func TestDeferCallToErrIsRequired(t *testing.T) {
 
 	result_int.
 		Success(25).
-		Defer(func() { executed = true })
+		Defer(func(x int) { executed = true })
 
 	assert.Equal(t, false, executed)
 }
