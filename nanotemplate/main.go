@@ -18,9 +18,10 @@ const (
 )
 
 var (
-	typeName      = flag.String("T", "", "TYPE to substitute in the template")
-	inputFilename = flag.String("input", "", "INPUT template filename")
-	importName    = flag.String("I", "", "IMPORT string for importing a type")
+	typeName          = flag.String("T", "", "TYPE to substitute in the template")
+	lowercaseTypeName = flag.String("t", "", "LOWERCASETYPE to substitute in package name")
+	inputFilename     = flag.String("input", "", "INPUT template filename")
+	importName        = flag.String("I", "", "IMPORT string for importing a type")
 )
 
 func main() {
@@ -38,8 +39,11 @@ func main() {
 		*importName = "\"" + *importName + "\""
 	}
 
-	lowercaseTypeName := strings.ToLower(*typeName)
-	packageName := "result_" + lowercaseTypeName
+	if *lowercaseTypeName == "" {
+		*lowercaseTypeName = strings.ToLower(*typeName)
+	}
+
+	packageName := "result_" + *lowercaseTypeName
 	packageFile := packageName + ".t.go"
 	outputFile := path.Join(packageName, packageFile)
 
@@ -48,7 +52,7 @@ func main() {
 	readTemplate().Chain(
 		replace("{{I}}", *importName),
 		replace("{{T}}", *typeName),
-		replace("{{t}}", lowercaseTypeName),
+		replace("{{t}}", *lowercaseTypeName),
 		saveTo(outputFile),
 	).OnErrorFn(reportGenerationError)
 }
