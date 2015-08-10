@@ -1,6 +1,6 @@
-//go:generate nanoinstall -M result -v v1.2.1
-//go:generate nanotemplate -T *os.File -t file -I os --input=result.go.t
-//go:generate nanotemplate -T *http.Response -t response -I net/http --input=result.go.t
+//go:generate nanoinstall -M result -v v1.3.0
+//go:generate nanotemplate -T *os.File -t file -I os --input=_result.tt.go
+//go:generate nanotemplate -T *http.Response -t response -I net/http --input=_result.tt.go
 package main
 
 import (
@@ -15,8 +15,9 @@ import (
 )
 
 const (
-	rootUrl = "https://github.com/nanoservice/monad.go/raw/"
-	ext     = ".go.t"
+	rootUrl     = "https://github.com/nanoservice/monad.go/raw/"
+	ext         = ".go.t"
+	templateExt = ".tt.go"
 )
 
 var (
@@ -49,7 +50,7 @@ func reportError(err error) {
 }
 
 func openOutputFile() result_file.Result {
-	out, err := os.Create(*monad + ext)
+	out, err := os.Create("_" + *monad + templateExt)
 	return result_file.
 		NewResult(out, err).
 		Defer(closeOutputFile)
