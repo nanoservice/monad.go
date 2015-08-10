@@ -1,5 +1,5 @@
-//go:generate nanotemplate -T string --input=result.go.t
-//go:generate nanotemplate -T int --input=result.go.t
+//go:generate nanotemplate -T string --input=_result.tt.go
+//go:generate nanotemplate -T int --input=_result.tt.go
 package result
 
 import (

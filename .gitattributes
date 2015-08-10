@@ -1,2 +1,2 @@
-*.go.t binary
 *.t.go binary
+*.tt.go binary
