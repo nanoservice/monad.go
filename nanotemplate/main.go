@@ -1,5 +1,5 @@
-//go:generate nanoinstall -M result -v v1.1.0
-//go:generate nanotemplate -T string --input=result.go.t
+//go:generate nanoinstall -M result -v v1.3.0
+//go:generate nanotemplate -T string --input=_result.tt.go
 package main
 
 import (
