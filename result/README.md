@@ -97,3 +97,117 @@ Then run `go generate` and you will get these files:
   result_int/
              result_int.t.go
 ```
+
+## Usage
+
+### `NewResult(value T, err error) Result<T>`
+
+`NewResult(value, err)` constructs new `Result` monad instance given you already have value-error pair.
+
+```go
+func OpenResource(config Resource.Config) result_resource.Result {
+  resource, err := Resource.Open(config)
+  return result_resource.NewResult(resource, err)
+}
+```
+
+### `Success(value T) Result<T>`
+
+`Success(value)` constructs successful `Result` monad instance given a value.
+
+```go
+result_string.Success("a string value")
+// => Result <string> {"a string value"}
+```
+
+### `Failure(err error) Result<T>`
+
+`Failure(err)` constructs failed `Result` monad instance given an error value.
+
+```go
+result_int.Failure(errors.New("Incompatible numbers"))
+// => Result <int> {err: Error{"Incompatible numbers"}}
+```
+
+### `(Result<T>) Bind(fn func(T) Result<T>) Result<T>`
+
+`Result.Bind(fn)` will call `fn` with value it holds if it is in `Success` state; it will return whatever `fn` returned in that case.
+
+In case monad is in `Failure` state, `Result.Bind(fn)` will not call `fn` and return itself immediately.
+
+```go
+result_string.
+  Success("world").
+  Bind(func(name string) result_string.Result {
+    return result_string.Success("hello, " + name)
+  })
+// => Result <string> {"hello, world"}
+
+result_string.
+  Failure(errors.New("Unable to fetch user name")).
+  Bind(func(name string) result_string.Result {
+    return result_string.Success("hello, " + name)
+  })
+// => Result <string> {err: Error{"Unable to fetch user name"}}
+```
+
+### `(Result<T>) Defer(fn func(T)) Result<T>`
+
+`Result.Defer(fn)` will schedule deferred call to `fn` if it is in `Success` state; it will return itself immediately.
+
+In case monad is in `Failure` state, `Result.Defer(fn)` will not schedule call to `fn` and return itself immediately.
+
+Scheduled functions are executed in the order they are scheduled upon call to `Result.Err()`, regardless of state of the monad instance.
+
+```go
+openResource().Defer(func(resource *resource.Resource) {
+  resource.Close()
+}).Bind(...)
+```
+
+### `(Result<T>) Chain(fns... func(T) Result<T>) Result<T>`
+
+`Result.Chain(fns)` is a syntactic sugar for a chain of subsequent `.Bind(fn)` calls.
+
+```go
+openResource().Chain(
+  fetchMetaConfig,
+  connectToBrokers,
+  setupListeners,
+  setupPublishers,
+)
+```
+
+### `(Result<T>) OnErrorFn(fn func(error)) Result<T>`
+
+`Result.OnErrorFn(fn)` calls `fn` with error it contains if it is in `Failure` state; returns itself afterwards.
+
+If it is in `Success` state, then `fn` is not called and it returns itself immediately.
+
+```go
+openResource().Chain(
+  ...
+).OnErrorFn(reportBrokenResource)
+```
+
+### `(Result<T>) Err() error`
+
+`Result.Err()` fetches error value from the monad instance. Returns `nil` for monad instance in `Success` state.
+
+Intended to be used at the end of monad call chains and closer to the top of the application.
+
+Executes all scheduled functions.
+
+```go
+result_int.Success(4).Err()
+// => nil
+
+result_int.
+  Failure(errors.New("Unable to read configuration file")).
+  Err()
+// => Error{"Unable to read configuration file"}
+```
+
+---
+
+[List of Monads](https://github.com/nanoservice/monad.go#monads)
