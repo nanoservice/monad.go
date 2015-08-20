@@ -43,7 +43,7 @@ func main() {
 		*lowercaseTypeName = strings.ToLower(*typeName)
 	}
 
-	packageName := "result_" + *lowercaseTypeName
+	packageName := packagePrefix() + "_" + *lowercaseTypeName
 	packageFile := packageName + ".t.go"
 	outputFile := path.Join(packageName, packageFile)
 
@@ -55,6 +55,11 @@ func main() {
 		replace("{{t}}", *lowercaseTypeName),
 		saveTo(outputFile),
 	).OnErrorFn(reportGenerationError)
+}
+
+// assumes _package_prefix_here.tt.go
+func packagePrefix() string {
+	return (*inputFilename)[1 : len(*inputFilename)-6]
 }
 
 func reportIsNotProvided(what string) {
