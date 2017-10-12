@@ -80,17 +80,6 @@ Use `errorMonad.Return` function to wrap `err` value in monadic context.
 errorMonad.Return(errors.New("Unable to load config"))
 ```
 
-### `(errorMonad.Error) Bind(fn func() error) errorMonad.Error`
-
-Use `(errorMonad.Error) Bind` function to attach new item to a chain. `fn` will
-get called if and only if previous chain item haven't returned error.
-
-```go
-e.Bind(func() error {
-  return doSomethingCausingError()
-})
-```
-
 ### `(errorMonad.Error) Chain(fn (func() error)...) errorMonad.Error`
 
 Use `(errorMonad.Error) Chain` function if you find yourself chaining too much
